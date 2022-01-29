@@ -1,0 +1,18 @@
+{
+	"name": "Svelte Image Editor",
+	"short_name": "Svelte Image Editor",
+	"description": "Svelte Image Editor",
+	"version": "1.0",
+	"manifest_version": 3,
+	"icons": [
+		{
+			"src": "/svelte-image-editor/favicon.png",
+			"sizes": "128x128",
+			"type": "image/png"
+		}
+	],
+	"start_url": "/svelte-image-editor",
+	"display": "standalone",
+	"background_color": "#ffffff",
+	"theme_color": "#07689f"
+}
