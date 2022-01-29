@@ -208,7 +208,9 @@
 	.bounding-box {
 		position: absolute;
 		transform-origin: center;
-		border: 2px solid #888;
+		margin-left: -2px;
+		margin-top: -2px;
+		border: 2px dashed #000;
 	}
 	.bounding-box.inactive {
 		z-index: -1;
