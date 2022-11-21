@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ImageEditor from '$lib/components/ImageEditor.svelte';
+	import { ImageEditor } from '$lib';
 
 	let canvas: HTMLCanvasElement;
 

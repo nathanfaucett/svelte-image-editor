@@ -31,7 +31,7 @@
 <script lang="ts">
 	import type { FullGestureState } from '@use-gesture/vanilla';
 	import { DragGesture } from '@use-gesture/vanilla';
-	import { clickOutside } from 'svelte-use-click-outside';
+	import { clickoutside } from '@svelte-put/clickoutside';
 	import { vec2, mat2d } from 'gl-matrix';
 	import { onMount, tick } from 'svelte';
 	import { composeMat2d, getAngleBetweenPoints } from '$lib/utils';
@@ -41,24 +41,27 @@
 	export let scale: vec2 = vec2.fromValues(1, 1);
 	export let rotation: number = 0;
 	export let transform: mat2d = mat2d.create();
-	export let image: HTMLImageElement = typeof Image === 'undefined' ? null : new Image();
-	export let canvas: HTMLCanvasElement = undefined;
-	export let ctx: CanvasRenderingContext2D = undefined;
+	export let image: HTMLImageElement | undefined =
+		typeof Image === 'undefined' ? undefined : new Image();
+	export let canvas: HTMLCanvasElement | undefined = undefined;
+	export let ctx: CanvasRenderingContext2D | undefined = undefined;
 
 	let clientWidth: number;
 	let clientHeight: number;
 	let imageWidth: number;
 	let imageHeight: number;
 	let imageSize = vec2.create();
-	$: ctx = canvas?.getContext('2d');
+	$: ctx = canvas?.getContext('2d') || undefined;
 
 	let currentSrc: HTMLImageElement['src'];
 	$: if (image && currentSrc !== src) {
 		image.crossOrigin = 'anonymous';
 		image.onload = () => {
-			const ratio = Math.min(clientWidth / image.width, clientHeight / image.height);
-			imageWidth = image.width * ratio;
-			imageHeight = image.height * ratio;
+			if (image) {
+				const ratio = Math.min(clientWidth / image.width, clientHeight / image.height);
+				imageWidth = image.width * ratio;
+				imageHeight = image.height * ratio;
+			}
 		};
 		image.src = src;
 		currentSrc = src;
@@ -84,7 +87,7 @@
 	}
 
 	$: render = () => {
-		if (ctx) {
+		if (ctx && image) {
 			renderImage(ctx, clientWidth, clientHeight, image, imageWidth, imageHeight, transform);
 		}
 	};
@@ -92,11 +95,15 @@
 	$: tick().then(render);
 
 	let focused = false;
+	let focusedAt = 0;
 	function onFocus() {
 		focused = true;
+		focusedAt = Date.now();
 	}
 	function onBlur() {
-		focused = false;
+		if (focusedAt < Date.now() - 100) {
+			focused = false;
+		}
 	}
 
 	function onDrag(
@@ -181,7 +188,8 @@
 	<div
 		class="bounding-box"
 		class:inactive={!focused}
-		use:clickOutside={onBlur}
+		use:clickoutside
+		on:clickoutside={onBlur}
 		style={`left:${center[0]}px;top:${center[1]}px;width:${imageWidth}px;height:${imageHeight}px;transform:matrix(${transform[0]},${transform[1]},${transform[2]},${transform[3]},${transform[4]},${transform[5]})`}
 	>
 		<div class="move" bind:this={move} />
